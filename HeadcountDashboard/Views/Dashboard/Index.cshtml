@@ -1,0 +1,264 @@
+﻿@model HeadcountDashboard.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Headcount Dashboard";
+}
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="alert alert-success">
+        Admin role confirmed.
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        Admin role NOT found.
+    </div>
+}
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Total Headcount</h6>
+                <h2 class="fw-bold">@Model.TotalHeadcount</h2>
+                <small class="text-muted">Today's workforce</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">A Shift</h6>
+                <h2 class="fw-bold">@Model.AShiftTotal</h2>
+                <small class="text-muted">Employees</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">B Shift</h6>
+                <h2 class="fw-bold">@Model.BShiftTotal</h2>
+                <small class="text-muted">Employees</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">C Shift</h6>
+                <h2 class="fw-bold">@Model.CShiftTotal</h2>
+                <small class="text-muted">Employees</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="container-fluid">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Headcount Dashboard</h2>
+            <p class="text-muted mb-0">
+                Daily workforce headcount
+            </p>
+        </div>
+
+        <form method="get"
+              asp-controller="Dashboard"
+              asp-action="Index">
+
+            <div class="input-group">
+                <input type="date"
+                       name="date"
+                       value="@Model.BusinessDate.ToString("yyyy-MM-dd")"
+                       class="form-control" />
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Load
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <form asp-controller="Dashboard"
+          asp-action="Save"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               name="businessDate"
+               value="@Model.BusinessDate.ToString("yyyy-MM-dd")" />
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Department</th>
+                                <th>Code</th>
+                                <th class="text-center">A Shift</th>
+                                <th class="text-center">B Shift</th>
+                                <th class="text-center">C Shift</th>
+                                <th class="text-center">Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Departments.Count; i++)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @Model.Departments[i].DepartmentName
+
+                                        @if (Model.Departments[i].UpdatedAt.HasValue)
+                                        {
+                                            <div class="small text-muted mt-1">
+                                                Updated by: @Model.Departments[i].UpdatedBy
+                                                <br />
+                                                Updated at:
+                                                @TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                                                    Model.Departments[i].UpdatedAt.Value,
+                                                    "Asia/Dubai"
+                                                ).ToString("dd MMM yyyy, hh:mm tt")
+                                            </div>
+                                        }
+
+                                        <input type="hidden"
+                                               asp-for="Departments[i].DepartmentId" />
+
+                                        <input type="hidden"
+                                               asp-for="Departments[i].DepartmentName" />
+
+                                        <input type="hidden"
+                                               asp-for="Departments[i].DepartmentCode" />
+                                    </td>
+
+                                    <td>
+                                        @Model.Departments[i].DepartmentCode
+                                    </td>
+
+                                    <td>
+                                        <input asp-for="Departments[i].AShiftCount"
+                                               type="number"
+                                               min="0"
+                                               class="form-control text-center" 
+                                               readonly="@(!User.IsInRole("Admin"))" />
+                                    </td>
+
+                                    <td>
+                                        <input asp-for="Departments[i].BShiftCount"
+                                               type="number"
+                                               min="0"
+                                               class="form-control text-center" 
+                                               readonly="@(!User.IsInRole("Admin"))" />
+                                    </td>
+
+                                    <td>
+                                        <input asp-for="Departments[i].CShiftCount"
+                                               type="number"
+                                               min="0"
+                                               class="form-control text-center" 
+                                               readonly="@(!User.IsInRole("Admin"))" />
+                                    </td>
+
+                                    <td class="text-center fw-bold">
+                                        @Model.Departments[i].Total
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                        <tfoot class="table-secondary fw-bold">
+
+                            <tr>
+
+                                <td colspan="2">
+                                    Overall Total
+                                </td>
+
+                                <td class="text-center">
+                                    @Model.Departments.Sum(x => x.AShiftCount)
+                                </td>
+
+                                <td class="text-center">
+                                    @Model.Departments.Sum(x => x.BShiftCount)
+                                </td>
+
+                                <td class="text-center">
+                                    @Model.Departments.Sum(x => x.CShiftCount)
+                                </td>
+
+                                <td class="text-center">
+                                    @Model.Departments.Sum(x => x.Total)
+                                </td>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit"
+                                class="btn btn-success px-4">
+                            Save Headcount
+                        </button>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

@@ -1,31 +1,452 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Existing ASP.NET Core styles... */
+
+
+/* =========================================================
+   UPM HEADCOUNT DASHBOARD
+   ========================================================= */
+
+:root {
+    --navy: #1b2560;
+    --navy-deep: #12194a;
+    --paper: #f4f2ec;
+    --paper-dim: #e9e6db;
+    --ink: #1c1f2b;
+    --ink-dim: #6b7080;
+    --teal: #2e8b7a;
+    --white: #ffffff;
+    --line: rgba(27, 37, 96, 0.12);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.upm-root {
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 40px;
 }
 
-body {
-  margin-bottom: 60px;
+.upm-header {
+    background: linear-gradient( 155deg, var(--navy) 0%, var(--navy-deep) 100% );
+    color: var(--white);
+    padding: 28px 32px 34px;
+    position: relative;
+    overflow: hidden;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.upm-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.upm-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
+
+.upm-wordmark {
+    font-family: 'Oswald', sans-serif;
+    line-height: 1;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+    .upm-wordmark .line2 {
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+.upm-clock {
+    text-align: right;
+    font-family: 'Oswald', sans-serif;
+}
+
+    .upm-clock .time {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .upm-clock .date {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.55);
+        letter-spacing: 1px;
+        margin-top: 2px;
+    }
+
+.upm-total-strip {
+    margin-top: 26px;
+    display: flex;
+    align-items: flex-end;
+    gap: 36px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.upm-total-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -1px;
+}
+
+.upm-total-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 8px;
+}
+
+.upm-shift-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.upm-shift-pill {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+    .upm-shift-pill.active {
+        background: rgba(46, 139, 122, 0.35);
+        border-color: var(--teal);
+    }
+
+    .upm-shift-pill .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .upm-shift-pill.active .dot {
+        background: #6be0c6;
+        box-shadow: 0 0 6px #6be0c6;
+    }
+
+    .upm-shift-pill b {
+        font-weight: 700;
+    }
+
+
+/* BODY */
+
+.upm-body {
+    padding: 26px 32px 40px;
+}
+
+.upm-section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-dim);
+    margin: 0 0 14px 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .upm-section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+    }
+
+
+/* DEPARTMENT GRID */
+
+.upm-grid {
+    display: grid;
+    grid-template-columns: repeat( auto-fill, minmax(240px, 1fr) );
+    gap: 14px;
+    margin-bottom: 34px;
+}
+
+.upm-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 18px 16px;
+    position: relative;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+    .upm-card:hover {
+        box-shadow: 0 6px 18px rgba(27, 37, 96, 0.08);
+        transform: translateY(-1px);
+    }
+
+.upm-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.upm-card-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+}
+
+.upm-card-code {
+    font-size: 10px;
+    color: var(--ink-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.upm-card-total {
+    font-family: 'Oswald', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+}
+
+
+/* SHIFT BOXES */
+
+.upm-shift-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.upm-shift-box {
+    flex: 1;
+    background: var(--paper-dim);
+    border-radius: 6px;
+    padding: 7px 6px;
+    text-align: center;
+}
+
+    .upm-shift-box .lbl {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+    }
+
+    .upm-shift-box .val {
+        font-family: 'Oswald', sans-serif;
+        font-size: 17px;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+
+/* UPDATED INFO */
+
+.upm-card-updated {
+    font-size: 10.5px;
+    color: var(--ink-dim);
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .upm-card-updated .pulse {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #3fb88a;
+        box-shadow: 0 0 5px #3fb88a;
+    }
+
+
+/* MOBILE */
+
+@media (max-width: 520px) {
+
+    .upm-header-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .upm-user-name {
+        display: none;
+    }
+
+    .upm-header {
+        padding: 22px 18px 26px;
+    }
+
+    .upm-body {
+        padding: 22px 18px 30px;
+    }
+
+    .upm-total-num {
+        font-size: 46px;
+    }
+
+    .upm-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .upm-panel-row {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================================================
+   UPDATE HEADCOUNT PANEL
+   ========================================================= */
+
+.upm-panel {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 14px rgba(27, 37, 96, 0.05);
+}
+
+.upm-panel-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.upm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .upm-field label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ink-dim);
+    }
+
+    .upm-field .form-control,
+    .upm-field .form-select {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        font-size: 14px;
+    }
+
+        .upm-field .form-control:focus,
+        .upm-field .form-select:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(46, 139, 122, 0.12);
+        }
+
+.upm-save-btn {
+    margin-top: 4px;
+    width: 100%;
+    min-height: 44px;
+    border: none;
+    border-radius: 7px;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+    .upm-save-btn:hover {
+        background: var(--navy-deep);
+        transform: translateY(-1px);
+    }
+
+    .upm-save-btn:active {
+        transform: translateY(0);
+    }
+
+.upm-footer-note {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--ink-dim);
+}
+
+/* =========================================================
+   HEADER USER / LOGOUT
+   ========================================================= */
+
+.upm-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.upm-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upm-user-name {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.upm-user-role {
+    padding: 3px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.upm-logout-btn {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--white);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+    .upm-logout-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+    }

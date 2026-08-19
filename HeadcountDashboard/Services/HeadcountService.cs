@@ -63,9 +63,21 @@ namespace HeadcountDashboard.Services
         {
             if (model.Departments == null || !model.Departments.Any())
             {
-                return;
+                throw new ArgumentException(
+                    "No department headcount data was provided.");
             }
 
+            var duplicateDepartmentIds = model.Departments
+            .GroupBy(d => d.DepartmentId)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+            if (duplicateDepartmentIds.Any())
+            {
+                throw new ArgumentException(
+                    "Duplicate department headcount data was provided.");
+            }
             // Load all existing headcounts for the selected date in one query
             var existingHeadcounts = await _context.DailyHeadcounts
                 .Where(h => h.BusinessDate == businessDate)
@@ -92,6 +104,13 @@ namespace HeadcountDashboard.Services
                         "Headcount values cannot be negative.");
                 }
 
+                if (department.AShiftCount > 1000 ||
+                    department.BShiftCount > 1000 ||
+                    department.CShiftCount > 1000)
+                {
+                    throw new ArgumentException(
+                        "Headcount values cannot exceed 1000.");
+                }
                 if (existingHeadcounts.TryGetValue(
                     department.DepartmentId,
                     out var existingHeadcount))

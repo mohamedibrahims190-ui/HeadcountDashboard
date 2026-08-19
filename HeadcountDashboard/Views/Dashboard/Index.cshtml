@@ -4,80 +4,172 @@
     ViewData["Title"] = "Headcount Dashboard";
 }
 
-@if (User.IsInRole("Admin"))
-{
-    <div class="alert alert-success">
-        Admin role confirmed.
-    </div>
-}
-else
-{
-    <div class="alert alert-danger">
-        Admin role NOT found.
-    </div>
-}
+<!-- =========================================================
+     DASHBOARD HEADER
+     ========================================================= -->
+<div class="upm-root">
+<div class="upm-header">
 
-<div class="row g-3 mb-4">
+    <div class="upm-header-top">
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Total Headcount</h6>
-                <h2 class="fw-bold">@Model.TotalHeadcount</h2>
-                <small class="text-muted">Today's workforce</small>
+        <!-- Application title -->
+        <div class="upm-brand">
+
+            <div class="upm-wordmark">
+                <div class="line2">
+                    Live Headcount Board
+                </div>
             </div>
+
         </div>
+
+        <!-- Current time and business date -->
+            <div class="upm-header-actions">
+
+                <div class="upm-clock">
+
+                    <div class="time" id="upmClockTime">
+                        --:--:--
+                    </div>
+
+                    <div class="date" id="upmClockDate">
+                        @Model.BusinessDate.ToString("dd MMM yyyy")
+                    </div>
+
+                </div>
+
+
+                <div class="upm-user">
+
+                    <span class="upm-user-name">
+                        @User.Identity?.Name
+                    </span>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span class="upm-user-role">
+                            Admin
+                        </span>
+                    }
+
+                    <form asp-area="Identity"
+                          asp-page="/Account/Logout"
+                          method="post">
+
+                        <button type="submit"
+                                class="upm-logout-btn">
+                            Logout
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">A Shift</h6>
-                <h2 class="fw-bold">@Model.AShiftTotal</h2>
-                <small class="text-muted">Employees</small>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">B Shift</h6>
-                <h2 class="fw-bold">@Model.BShiftTotal</h2>
-                <small class="text-muted">Employees</small>
-            </div>
-        </div>
-    </div>
+    <!-- =====================================================
+         TOTAL HEADCOUNT SUMMARY
+         ===================================================== -->
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">C Shift</h6>
-                <h2 class="fw-bold">@Model.CShiftTotal</h2>
-                <small class="text-muted">Employees</small>
+    <div class="upm-total-strip">
+
+        <div>
+
+            <div class="upm-total-label">
+                Total present, all departments
             </div>
+
+            <div class="upm-total-num">
+                @Model.TotalHeadcount
+            </div>
+
         </div>
+
+
+        <!-- Shift summary -->
+
+        <div class="upm-shift-pills">
+
+            <div class="upm-shift-pill active">
+
+                <span class="dot"></span>
+
+                A Shift
+
+                <b>
+                    @Model.AShiftTotal
+                </b>
+
+            </div>
+
+
+            <div class="upm-shift-pill">
+
+                <span class="dot"></span>
+
+                B Shift
+
+                <b>
+                    @Model.BShiftTotal
+                </b>
+
+            </div>
+
+
+            <div class="upm-shift-pill">
+
+                <span class="dot"></span>
+
+                C Shift
+
+                <b>
+                    @Model.CShiftTotal
+                </b>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
-<div class="container-fluid">
 
+<!-- =========================================================
+     MAIN BODY
+     ========================================================= -->
+
+<div class="upm-body">
+
+
+    <!-- =====================================================
+         SUCCESS / ERROR MESSAGES
+         ===================================================== -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
             @TempData["SuccessMessage"]
+
             <button type="button"
                     class="btn-close"
                     data-bs-dismiss="alert"
                     aria-label="Close">
             </button>
+
         </div>
     }
+
+
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show"
              role="alert">
+
             @TempData["ErrorMessage"]
 
             <button type="button"
@@ -85,22 +177,46 @@ else
                     data-bs-dismiss="alert"
                     aria-label="Close">
             </button>
+
         </div>
     }
 
+
+    <!-- =====================================================
+         DATE SELECTION
+
+         IMPORTANT:
+         This is a GET form.
+
+         It calls:
+         DashboardController.Index(DateTime? date)
+
+         It is NOT the Save form.
+         ===================================================== -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-            <h2>Headcount Dashboard</h2>
+
+            <h2>
+                Headcount Dashboard
+            </h2>
+
             <p class="text-muted mb-0">
                 Daily workforce headcount
             </p>
+
         </div>
+
+
+        <!-- DATE FORM -->
 
         <form method="get"
               asp-controller="Dashboard"
               asp-action="Index">
 
             <div class="input-group">
+
                 <input type="date"
                        name="date"
                        value="@Model.BusinessDate.ToString("yyyy-MM-dd")"
@@ -108,157 +224,596 @@ else
 
                 <button type="submit"
                         class="btn btn-primary">
+
                     Load
+
                 </button>
+
             </div>
 
         </form>
+
     </div>
+
+
+    <!-- =====================================================
+         SAVE FORM START
+
+         Everything that must be submitted to:
+
+         DashboardController.Save()
+
+         belongs inside this form.
+         ===================================================== -->
 
     <form asp-controller="Dashboard"
           asp-action="Save"
           method="post">
 
+        <!-- CSRF protection -->
         @Html.AntiForgeryToken()
+
+
+        <!-- Selected business date -->
 
         <input type="hidden"
                name="businessDate"
                value="@Model.BusinessDate.ToString("yyyy-MM-dd")" />
 
-        <div class="card shadow-sm">
 
-            <div class="card-body">
+        <!-- =================================================
+             HIDDEN DEPARTMENT DATA
 
-                <div class="table-responsive">
+             The visible UI uses cards instead of a table.
 
-                    <table class="table table-bordered table-hover align-middle">
+             However, DashboardViewModel expects:
 
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Department</th>
-                                <th>Code</th>
-                                <th class="text-center">A Shift</th>
-                                <th class="text-center">B Shift</th>
-                                <th class="text-center">C Shift</th>
-                                <th class="text-center">Total</th>
-                            </tr>
-                        </thead>
+             Departments[0]
+             Departments[1]
+             Departments[2]
+             ...
 
-                        <tbody>
+             These hidden fields preserve the complete
+             department collection when the form is submitted.
+             ================================================= -->
+        @for (int i = 0; i < Model.Departments.Count; i++)
+        {
+            <input type="hidden"
+                   name="Departments[@i].DepartmentId"
+                   value="@Model.Departments[i].DepartmentId" />
 
-                            @for (int i = 0; i < Model.Departments.Count; i++)
-                            {
-                                <tr>
+            <input type="hidden"
+                   name="Departments[@i].DepartmentName"
+                   value="@Model.Departments[i].DepartmentName" />
 
-                                    <td>
-                                        @Model.Departments[i].DepartmentName
+            <input type="hidden"
+                   name="Departments[@i].DepartmentCode"
+                   value="@Model.Departments[i].DepartmentCode" />
 
-                                        @if (Model.Departments[i].UpdatedAt.HasValue)
-                                        {
-                                            <div class="small text-muted mt-1">
-                                                Updated by: @Model.Departments[i].UpdatedBy
-                                                <br />
-                                                Updated at:
-                                                @TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-                                                    Model.Departments[i].UpdatedAt.Value,
-                                                    "Asia/Dubai"
-                                                ).ToString("dd MMM yyyy, hh:mm tt")
-                                            </div>
-                                        }
 
-                                        <input type="hidden"
-                                               asp-for="Departments[i].DepartmentId" />
+            <!--
+                These three hidden fields contain the actual
+                values that will be submitted to Save().
 
-                                        <input type="hidden"
-                                               asp-for="Departments[i].DepartmentName" />
+                JavaScript updates these when the user changes
+                the values in the Update panel.
+            -->
 
-                                        <input type="hidden"
-                                               asp-for="Departments[i].DepartmentCode" />
-                                    </td>
+            <input type="hidden"
+                   name="Departments[@i].AShiftCount"
+                   id="hiddenA_@i"
+                   value="@Model.Departments[i].AShiftCount" />
 
-                                    <td>
-                                        @Model.Departments[i].DepartmentCode
-                                    </td>
+            <input type="hidden"
+                   name="Departments[@i].BShiftCount"
+                   id="hiddenB_@i"
+                   value="@Model.Departments[i].BShiftCount" />
 
-                                    <td>
-                                        <input asp-for="Departments[i].AShiftCount"
-                                               type="number"
-                                               min="0"
-                                               class="form-control text-center" 
-                                               readonly="@(!User.IsInRole("Admin"))" />
-                                    </td>
+            <input type="hidden"
+                   name="Departments[@i].CShiftCount"
+                   id="hiddenC_@i"
+                   value="@Model.Departments[i].CShiftCount" />
+        }
 
-                                    <td>
-                                        <input asp-for="Departments[i].BShiftCount"
-                                               type="number"
-                                               min="0"
-                                               class="form-control text-center" 
-                                               readonly="@(!User.IsInRole("Admin"))" />
-                                    </td>
 
-                                    <td>
-                                        <input asp-for="Departments[i].CShiftCount"
-                                               type="number"
-                                               min="0"
-                                               class="form-control text-center" 
-                                               readonly="@(!User.IsInRole("Admin"))" />
-                                    </td>
+        <!-- =================================================
+             DEPARTMENTS
+             ================================================= -->
 
-                                    <td class="text-center fw-bold">
-                                        @Model.Departments[i].Total
-                                    </td>
+        <div class="upm-section-title">
+            Departments
+        </div>
 
-                                </tr>
-                            }
 
-                        </tbody>
+        <div class="upm-grid">
 
-                        <tfoot class="table-secondary fw-bold">
+            @for (int i = 0; i < Model.Departments.Count; i++)
+            {
+                var department = Model.Departments[i];
 
-                            <tr>
+                <div class="upm-card">
 
-                                <td colspan="2">
-                                    Overall Total
-                                </td>
+                    <!-- Department name + total -->
 
-                                <td class="text-center">
-                                    @Model.Departments.Sum(x => x.AShiftCount)
-                                </td>
+                    <div class="upm-card-top">
 
-                                <td class="text-center">
-                                    @Model.Departments.Sum(x => x.BShiftCount)
-                                </td>
+                        <div>
 
-                                <td class="text-center">
-                                    @Model.Departments.Sum(x => x.CShiftCount)
-                                </td>
+                            <div class="upm-card-name">
+                                @department.DepartmentName
+                            </div>
 
-                                <td class="text-center">
-                                    @Model.Departments.Sum(x => x.Total)
-                                </td>
+                            <div class="upm-card-code">
+                                @department.DepartmentCode
+                            </div>
 
-                            </tr>
+                        </div>
 
-                        </tfoot>
 
-                    </table>
+                        <!-- Department total -->
+
+                        <div class="upm-card-total">
+                            @department.Total
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SHIFT COUNTS
+                         ================================================= -->
+
+                    <div class="upm-shift-row">
+
+
+                        <!-- A SHIFT -->
+
+                        <div class="upm-shift-box">
+
+                            <div class="lbl">
+                                A Shift
+                            </div>
+
+                            <div class="val">
+                                @department.AShiftCount
+                            </div>
+
+                        </div>
+
+
+                        <!-- B SHIFT -->
+
+                        <div class="upm-shift-box">
+
+                            <div class="lbl">
+                                B Shift
+                            </div>
+
+                            <div class="val">
+                                @department.BShiftCount
+                            </div>
+
+                        </div>
+
+
+                        <!-- C SHIFT -->
+
+                        <div class="upm-shift-box">
+
+                            <div class="lbl">
+                                C Shift
+                            </div>
+
+                            <div class="val">
+                                @department.CShiftCount
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         LAST UPDATED INFORMATION
+                         ================================================= -->
+                    @if (department.UpdatedAt.HasValue)
+                    {
+                        <div class="upm-card-updated">
+
+                            <span class="pulse"></span>
+
+                            <span>
+
+                                Updated by:
+                                @department.UpdatedBy
+
+                                <br />
+
+                                @TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                                    department.UpdatedAt.Value,
+                                    "Asia/Dubai"
+                                ).ToString("dd MMM yyyy, hh:mm tt")
+
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- =====================================================
+             UPDATE YOUR COUNT
+             ===================================================== -->
+
+        <div class="upm-section-title">
+            Update your count
+        </div>
+
+
+        <div class="upm-panel">
+
+
+            <!-- =================================================
+                 DEPARTMENT SELECTION
+                 ================================================= -->
+
+            <div class="upm-panel-row">
+
+                <div class="upm-field">
+
+                    <label for="departmentSelect">
+                        Department
+                    </label>
+
+                    <select id="departmentSelect"
+                            class="form-select">
+
+                        @for (int i = 0; i < Model.Departments.Count; i++)
+                        {
+                            <option value="@i">
+
+                                @Model.Departments[i].DepartmentName
+
+                            </option>
+                        }
+
+                    </select>
 
                 </div>
 
-                @if (User.IsInRole("Admin"))
-                {
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="submit"
-                                class="btn btn-success px-4">
-                            Save Headcount
-                        </button>
-                    </div>
-                }
+            </div>
+
+
+            <!-- =================================================
+                 SHIFT INPUTS
+                 ================================================= -->
+
+            <div class="upm-panel-row">
+
+
+                <!-- A SHIFT -->
+
+                <div class="upm-field">
+
+                    <label for="aShiftInput">
+                        A Shift
+                    </label>
+
+                    <input type="number"
+                           id="aShiftInput"
+                           min="0"
+                           max="1000"
+                           class="form-control" />
+
+                </div>
+
+
+                <!-- B SHIFT -->
+
+                <div class="upm-field">
+
+                    <label for="bShiftInput">
+                        B Shift
+                    </label>
+
+                    <input type="number"
+                           id="bShiftInput"
+                           min="0"
+                           max="1000"
+                           class="form-control" />
+
+                </div>
+
+
+                <!-- C SHIFT -->
+
+                <div class="upm-field">
+
+                    <label for="cShiftInput">
+                        C Shift
+                    </label>
+
+                    <input type="number"
+                           id="cShiftInput"
+                           min="0"
+                           max="1000"
+                           class="form-control" />
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SAVE BUTTON
+
+                 Only Admin users can save.
+                 ================================================= -->
+            @if (User.IsInRole("Admin"))
+            {
+                <button type="submit"
+                        class="upm-save-btn">
+
+                    Save count
+
+                </button>
+            }
+
+
+            <!-- Additional information -->
+
+            <div class="upm-footer-note">
+
+                Only Admin users can update headcount.
+                Changes are saved for the selected business date.
 
             </div>
 
         </div>
 
+
     </form>
+    <!-- =====================================================
+         SAVE FORM END
+         ================================================= -->
+
 
 </div>
+</div>
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    /*
+     * Convert the server-side department collection into
+     * JavaScript data.
+     *
+     * This allows the Update panel to display the current
+     * values when a department is selected.
+     */
+
+    const departments =
+        @Html.Raw(
+        System.Text.Json.JsonSerializer.Serialize(
+        Model.Departments
+        )
+        );
+
+
+    /*
+     * Get references to the UI controls.
+     */
+
+    const departmentSelect =
+        document.getElementById("departmentSelect");
+
+    const aShiftInput =
+        document.getElementById("aShiftInput");
+
+    const bShiftInput =
+        document.getElementById("bShiftInput");
+
+    const cShiftInput =
+        document.getElementById("cShiftInput");
+
+
+    /*
+     * Load the selected department's current values
+     * into the Update panel.
+     */
+
+    function loadDepartment(index) {
+        const department = departments[index];
+
+        if (!department) {
+            return;
+        }
+
+        aShiftInput.value =
+            department.AShiftCount;
+
+        bShiftInput.value =
+            department.BShiftCount;
+
+        cShiftInput.value =
+            department.CShiftCount;
+    }
+
+
+    /*
+     * Update the hidden fields that will actually be
+     * submitted to DashboardController.Save().
+     */
+
+    function updateHiddenFields() {
+        const index =
+            parseInt(departmentSelect.value);
+
+
+        /*
+         * Find the hidden fields for the selected department.
+         */
+
+        const hiddenA =
+            document.getElementById(`hiddenA_${index}`);
+
+        const hiddenB =
+            document.getElementById(`hiddenB_${index}`);
+
+        const hiddenC =
+            document.getElementById(`hiddenC_${index}`);
+
+
+        /*
+         * Update their values.
+         */
+
+        if (hiddenA) {
+            hiddenA.value =
+                aShiftInput.value;
+        }
+
+        if (hiddenB) {
+            hiddenB.value =
+                bShiftInput.value;
+        }
+
+        if (hiddenC) {
+            hiddenC.value =
+                cShiftInput.value;
+        }
+    }
+
+
+    /*
+     * When the user changes the department,
+     * load that department's current values.
+     */
+
+    departmentSelect.addEventListener(
+        "change",
+        function() {
+            const index =
+                parseInt(this.value);
+
+            loadDepartment(index);
+        }
+    );
+
+
+    /*
+     * When the user changes A/B/C values,
+     * immediately update the corresponding hidden
+     * fields.
+     */
+
+    aShiftInput.addEventListener(
+        "input",
+        updateHiddenFields
+    );
+
+    bShiftInput.addEventListener(
+        "input",
+        updateHiddenFields
+    );
+
+    cShiftInput.addEventListener(
+        "input",
+        updateHiddenFields
+    );
+
+
+    /*
+     * Load the first department when the page opens.
+     */
+
+    if (departments.length > 0) {
+        loadDepartment(0);
+    }
+
+
+    /*
+     * ========================================================
+     * LIVE CLOCK
+     * ========================================================
+     *
+     * This updates the clock displayed in the header.
+     */
+
+    function updateClock() {
+        const now = new Date();
+
+
+        /*
+         * Time
+         */
+
+        const time =
+            now.toLocaleTimeString(
+                "en-US",
+                {
+                    hour12: false
+                }
+            );
+
+
+        /*
+         * Date
+         */
+
+        const date =
+            now.toLocaleDateString(
+                "en-GB",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
+
+
+        const clockTime =
+            document.getElementById(
+                "upmClockTime"
+            );
+
+        const clockDate =
+            document.getElementById(
+                "upmClockDate"
+            );
+
+
+        if (clockTime) {
+            clockTime.textContent =
+                time;
+        }
+
+        /*
+         * Keep the server-selected business date
+         * in the header instead of replacing it.
+         *
+         * Therefore we intentionally do not update
+         * clockDate here.
+         */
+    }
+
+
+    /*
+     * Start clock.
+     */
+
+    updateClock();
+
+    setInterval(
+        updateClock,
+        1000
+    );
+
+</script>

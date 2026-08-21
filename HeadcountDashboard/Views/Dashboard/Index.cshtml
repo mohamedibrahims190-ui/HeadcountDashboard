@@ -76,62 +76,78 @@
 
     <div class="upm-total-strip">
 
-        <div>
+            <div>
 
-            <div class="upm-total-label">
-                Total present, all departments
+                <div class="upm-total-label">
+                    @Model.CurrentShift Shift Total, All Departments
+                </div>
+
+                <div class="upm-total-num">
+
+                    @if (Model.CurrentShift == "A")
+                    {
+                        @Model.Departments.Sum(d => d.AShiftCount)
+                    }
+                    else if (Model.CurrentShift == "B")
+                    {
+                        @Model.Departments.Sum(d => d.BShiftCount)
+                    }
+                    else if (Model.CurrentShift == "C")
+                    {
+                        @Model.Departments.Sum(d => d.CShiftCount)
+                    }
+
+                </div>
+
             </div>
-
-            <div class="upm-total-num">
-                @Model.TotalHeadcount
-            </div>
-
-        </div>
 
 
         <!-- Shift summary -->
 
-        <div class="upm-shift-pills">
+            <div class="upm-shift-pills">
 
-            <div class="upm-shift-pill active">
+                <!-- A Shift -->
+                <div class="upm-shift-pill @(Model.CurrentShift == "A" ? "active" : "")">
 
-                <span class="dot"></span>
+                    <span class="dot"></span>
 
-                A Shift
+                    A Shift
 
-                <b>
-                    @Model.AShiftTotal
-                </b>
+                    <b>
+                        @Model.AShiftTotal
+                    </b>
+
+                </div>
+
+
+                <!-- B Shift -->
+                <div class="upm-shift-pill @(Model.CurrentShift == "B" ? "active" : "")">
+
+                    <span class="dot"></span>
+
+                    B Shift
+
+                    <b>
+                        @Model.BShiftTotal
+                    </b>
+
+                </div>
+
+
+                <!-- C Shift -->
+                <div class="upm-shift-pill @(Model.CurrentShift == "C" ? "active" : "")">
+
+                    <span class="dot"></span>
+
+                    C Shift
+
+                    <b>
+                        @Model.CShiftTotal
+                    </b>
+
+                </div>
 
             </div>
-
-
-            <div class="upm-shift-pill">
-
-                <span class="dot"></span>
-
-                B Shift
-
-                <b>
-                    @Model.BShiftTotal
-                </b>
-
-            </div>
-
-
-            <div class="upm-shift-pill">
-
-                <span class="dot"></span>
-
-                C Shift
-
-                <b>
-                    @Model.CShiftTotal
-                </b>
-
-            </div>
-
-        </div>
 
     </div>
 
@@ -211,27 +227,21 @@
 
         <!-- DATE FORM -->
 
-        <form method="get"
-              asp-controller="Dashboard"
-              asp-action="Index">
+            <form method="get"
+                  asp-controller="Dashboard"
+                  asp-action="Index">
 
-            <div class="input-group">
+                <div class="input-group">
 
-                <input type="date"
-                       name="date"
-                       value="@Model.BusinessDate.ToString("yyyy-MM-dd")"
-                       class="form-control" />
+                    <input type="date"
+                           name="date"
+                           value="@Model.BusinessDate.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           onchange="this.form.submit();" />
 
-                <button type="submit"
-                        class="btn btn-primary">
+                </div>
 
-                    Load
-
-                </button>
-
-            </div>
-
-        </form>
+            </form>
 
     </div>
 
@@ -429,10 +439,13 @@
 
                                 <br />
 
-                                @TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-                                    department.UpdatedAt.Value,
-                                    "Asia/Dubai"
-                                ).ToString("dd MMM yyyy, hh:mm tt")
+                                    @TimeZoneInfo.ConvertTimeFromUtc(
+                                         DateTime.SpecifyKind(
+                                             department.UpdatedAt.Value,
+                                             DateTimeKind.Utc
+                                         ),
+                                         TimeZoneInfo.FindSystemTimeZoneById("Asia/Dubai")
+                                     ).ToString("dd MMM yyyy, hh:mm tt")
 
                             </span>
 
@@ -462,7 +475,17 @@
                  ================================================= -->
 
             <div class="upm-panel-row">
+                    <div class="upm-active-shift-banner">
 
+                        <span>●</span>
+
+                        <span>
+                            <b>@Model.CurrentShift Shift</b>
+                            is currently active.
+                            You can update @Model.CurrentShift Shift only.
+                        </span>
+
+                    </div>
                 <div class="upm-field">
 
                     <label for="departmentSelect">
@@ -492,60 +515,59 @@
                  SHIFT INPUTS
                  ================================================= -->
 
-            <div class="upm-panel-row">
+                <div class="upm-panel-row">
+
+                    <!-- A SHIFT -->
+                    <div class="upm-field">
+
+                        <label for="aShiftInput">
+                            A Shift
+                        </label>
+
+                        <input type="number"
+                               id="aShiftInput"
+                               min="0"
+                               max="1000"
+                               class="form-control"
+                        @(Model.CurrentShift != "A" || !Model.IsEditableDate ? "readonly" : "") />
+
+                    </div>
 
 
-                <!-- A SHIFT -->
+                    <!-- B SHIFT -->
+                    <div class="upm-field">
 
-                <div class="upm-field">
+                        <label for="bShiftInput">
+                            B Shift
+                        </label>
 
-                    <label for="aShiftInput">
-                        A Shift
-                    </label>
+                        <input type="number"
+                               id="bShiftInput"
+                               min="0"
+                               max="1000"
+                               class="form-control"
+                        @(Model.CurrentShift != "B" || !Model.IsEditableDate ? "readonly" : "") />
 
-                    <input type="number"
-                           id="aShiftInput"
-                           min="0"
-                           max="1000"
-                           class="form-control" />
+                    </div>
+
+
+                    <!-- C SHIFT -->
+                    <div class="upm-field">
+
+                        <label for="cShiftInput">
+                            C Shift
+                        </label>
+
+                        <input type="number"
+                               id="cShiftInput"
+                               min="0"
+                               max="1000"
+                               class="form-control"
+                        @(Model.CurrentShift != "C" || !Model.IsEditableDate ? "readonly" : "") />
+
+                    </div>
 
                 </div>
-
-
-                <!-- B SHIFT -->
-
-                <div class="upm-field">
-
-                    <label for="bShiftInput">
-                        B Shift
-                    </label>
-
-                    <input type="number"
-                           id="bShiftInput"
-                           min="0"
-                           max="1000"
-                           class="form-control" />
-
-                </div>
-
-
-                <!-- C SHIFT -->
-
-                <div class="upm-field">
-
-                    <label for="cShiftInput">
-                        C Shift
-                    </label>
-
-                    <input type="number"
-                           id="cShiftInput"
-                           min="0"
-                           max="1000"
-                           class="form-control" />
-
-                </div>
-
-            </div>
 
 
             <!-- =================================================

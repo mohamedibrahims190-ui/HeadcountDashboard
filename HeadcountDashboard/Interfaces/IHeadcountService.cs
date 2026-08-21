@@ -9,6 +9,7 @@ namespace HeadcountDashboard.Interfaces
         Task SaveHeadcountsAsync(
         DateTime businessDate,
         DashboardViewModel model,
-        string updatedBy);
+        string updatedBy,
+        string currentShift);
     }
 }

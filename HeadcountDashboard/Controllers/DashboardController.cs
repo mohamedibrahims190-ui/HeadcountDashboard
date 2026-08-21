@@ -27,6 +27,12 @@ namespace HeadcountDashboard.Controllers
             var model = await _headcountService
                 .GetDashboardAsync(businessDate);
 
+            model.CurrentShift = GetCurrentShift();
+            var currentBusinessDate = GetCurrentBusinessDate();
+
+            model.IsEditableDate =
+                model.BusinessDate.Date == currentBusinessDate.Date;
+
             return View(model);
         }
 
@@ -34,8 +40,8 @@ namespace HeadcountDashboard.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(
-        DateTime businessDate,
-        DashboardViewModel model)
+            DateTime businessDate,
+            DashboardViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -46,10 +52,24 @@ namespace HeadcountDashboard.Controllers
 
             try
             {
+                var currentShift = GetCurrentShift();
+                var currentBusinessDate = GetCurrentBusinessDate();
+
+                if (businessDate.Date != currentBusinessDate.Date)
+                {
+                    TempData["ErrorMessage"] =
+                        "Only the current business date can be edited.";
+
+                    return RedirectToAction(
+                        nameof(Index),
+                        new { date = businessDate });
+                }
+
                 await _headcountService.SaveHeadcountsAsync(
                     businessDate,
                     model,
-                    updatedBy);
+                    updatedBy,
+                    currentShift);
 
                 TempData["SuccessMessage"] =
                     "Headcount saved successfully.";
@@ -72,6 +92,37 @@ namespace HeadcountDashboard.Controllers
             return RedirectToAction(
                 nameof(Index),
                 new { date = businessDate });
+        }
+        private string GetCurrentShift()
+        {
+            var now = DateTime.Now.TimeOfDay;
+
+            if (now >= TimeSpan.FromHours(6) &&
+                now < TimeSpan.FromHours(14))
+            {
+                return "A";
+            }
+
+            if (now >= TimeSpan.FromHours(14) &&
+                now < TimeSpan.FromHours(22))
+            {
+                return "B";
+            }
+
+            return "C";
+        }
+
+        private DateTime GetCurrentBusinessDate()
+        {
+            var now = DateTime.Now;
+
+            // Business day starts at 06:00
+            if (now.TimeOfDay < TimeSpan.FromHours(6))
+            {
+                return now.Date.AddDays(-1);
+            }
+
+            return now.Date;
         }
     }
 }

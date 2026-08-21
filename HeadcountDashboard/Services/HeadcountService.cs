@@ -59,7 +59,8 @@ namespace HeadcountDashboard.Services
         public async Task SaveHeadcountsAsync(
         DateTime businessDate,
         DashboardViewModel model,
-        string updatedBy)
+        string updatedBy,
+        string currentShift)
         {
             if (model.Departments == null || !model.Departments.Any())
             {
@@ -112,15 +113,49 @@ namespace HeadcountDashboard.Services
                         "Headcount values cannot exceed 1000.");
                 }
                 if (existingHeadcounts.TryGetValue(
-                    department.DepartmentId,
-                    out var existingHeadcount))
+                department.DepartmentId,
+                out var existingHeadcount))
                 {
-                    // Update existing record
-                    existingHeadcount.AShiftCount = department.AShiftCount;
-                    existingHeadcount.BShiftCount = department.BShiftCount;
-                    existingHeadcount.CShiftCount = department.CShiftCount;
-                    existingHeadcount.UpdatedAt = DateTime.UtcNow;
-                    existingHeadcount.UpdatedBy = updatedBy;
+                    bool shiftChanged = false;
+
+                    switch (currentShift)
+                    {
+                        case "A":
+                            if (existingHeadcount.AShiftCount != department.AShiftCount)
+                            {
+                                existingHeadcount.AShiftCount = department.AShiftCount;
+                                shiftChanged = true;
+                            }
+                            break;
+
+                        case "B":
+                            if (existingHeadcount.BShiftCount != department.BShiftCount)
+                            {
+                                existingHeadcount.BShiftCount = department.BShiftCount;
+                                shiftChanged = true;
+                            }
+                            break;
+
+                        case "C":
+                            if (existingHeadcount.CShiftCount != department.CShiftCount)
+                            {
+                                existingHeadcount.CShiftCount = department.CShiftCount;
+                                shiftChanged = true;
+                            }
+                            break;
+
+                        default:
+                            throw new ArgumentException(
+                                "Invalid current shift.");
+                    }
+
+                    // Update audit information only when
+                    // the active shift count actually changed.
+                    if (shiftChanged)
+                    {
+                        existingHeadcount.UpdatedAt = DateTime.UtcNow;
+                        existingHeadcount.UpdatedBy = updatedBy;
+                    }
                 }
                 else
                 {
@@ -130,9 +165,18 @@ namespace HeadcountDashboard.Services
                         DepartmentId = department.DepartmentId,
                         BusinessDate = businessDate,
 
-                        AShiftCount = department.AShiftCount,
-                        BShiftCount = department.BShiftCount,
-                        CShiftCount = department.CShiftCount,
+                        AShiftCount = currentShift == "A"
+        ? department.AShiftCount
+        : 0,
+
+                        BShiftCount = currentShift == "B"
+        ? department.BShiftCount
+        : 0,
+
+                        CShiftCount = currentShift == "C"
+        ? department.CShiftCount
+        : 0,
+
                         UpdatedAt = DateTime.UtcNow,
                         UpdatedBy = updatedBy
                     };

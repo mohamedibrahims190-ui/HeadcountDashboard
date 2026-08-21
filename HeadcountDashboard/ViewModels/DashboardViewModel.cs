@@ -19,6 +19,10 @@ namespace HeadcountDashboard.ViewModels
         public int CShiftTotal =>
             Departments.Sum(x => x.CShiftCount);
 
+        public string CurrentShift { get; set; } = string.Empty;
+
+        public bool IsEditableDate { get; set; }
+
     }
 
     public class DepartmentHeadcountViewModel
